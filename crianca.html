@@ -1,38 +1,57 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-
   <meta charset="UTF-8">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro da Criança</title>
-
   <link rel="stylesheet" href="style.css">
-
 </head>
-
 <body>
-
-  <div class="container">
-
-    <h1>Cadastro da Criança</h1>
-
-    <input type="text"
-      placeholder="Nome da Criança">
-
-    <input type="number"
-      placeholder="Idade">
-
-    <input type="text"
-      placeholder="Escola">
-
-    <button onclick="finalizar()">
-      Finalizar Cadastro
-    </button>
-
+ 
+  <div class="page" id="page-crianca">
+    <div class="container">
+ 
+      <div class="step-indicator">
+        <div class="step done">
+          <span class="step-number">✓</span>
+          <span class="step-label">Responsável</span>
+        </div>
+        <div class="step-line active"></div>
+        <div class="step active">
+          <span class="step-number">2</span>
+          <span class="step-label">Criança</span>
+        </div>
+      </div>
+ 
+      <h1>Cadastro da Criança</h1>
+      <p class="subtitle">Agora informe os dados da criança.</p>
+ 
+      <div class="field" id="f-nome-crianca">
+        <label for="nome-crianca">Nome da criança</label>
+        <input type="text" id="nome-crianca" placeholder="Ex: João da Silva">
+        <span class="err">Campo obrigatório</span>
+      </div>
+ 
+      <div class="field" id="f-idade">
+        <label for="idade">Idade</label>
+        <input type="number" id="idade" placeholder="Ex: 8" min="0" max="17">
+        <span class="err">Campo obrigatório</span>
+      </div>
+ 
+      <div class="field" id="f-escola">
+        <label for="escola">Escola</label>
+        <input type="text" id="escola" placeholder="Ex: E.M. Monteiro Lobato">
+        <span class="err">Campo obrigatório</span>
+      </div>
+ 
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="window.location.href='responsavel.html'">← Voltar</button>
+        <button class="btn" onclick="finalizar()">Finalizar →</button>
+      </div>
+ 
+    </div>
   </div>
-
+ 
   <script src="script.js"></script>
-
 </body>
 </html>
