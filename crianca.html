@@ -1,34 +1,244 @@
+Cadastro · HTML
+Copiar
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastro da Criança</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Cadastro</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap');
+ 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    :root {
+      --bg: #F5F2EC;
+      --surface: #FFFFFF;
+      --accent: #2D5016;
+      --accent-light: #E8F0DF;
+      --text: #1A1A1A;
+      --muted: #6B6B6B;
+      --border: #DDD9D0;
+      --error: #C0392B;
+      --error-bg: #FDF0EE;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+ 
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+ 
+    /* ── Telas ── */
+    .tela { display: none; width: 100%; justify-content: center; }
+    .tela.ativa { display: flex; }
+ 
+    .container {
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 440px;
+      animation: fadeUp 0.35s ease both;
+    }
+ 
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+ 
+    /* ── Steps ── */
+    .steps { display: flex; align-items: center; margin-bottom: 2rem; }
+ 
+    .step { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+ 
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--border); color: var(--muted);
+      font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s;
+    }
+    .step.ativo .step-num  { background: var(--accent); color: #fff; }
+    .step.feito .step-num  { background: var(--accent-light); color: var(--accent); }
+ 
+    .step-label { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .step.ativo .step-label { color: var(--accent); }
+ 
+    .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 10px 16px; }
+    .step-line.ativo { background: var(--accent); }
+ 
+    /* ── Textos ── */
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.75rem; color: var(--text);
+      margin-bottom: 0.35rem; line-height: 1.2;
+    }
+    .sub { font-size: 14px; color: var(--muted); margin-bottom: 1.75rem; line-height: 1.5; }
+ 
+    /* ── Campos ── */
+    .field { margin-bottom: 1.1rem; }
+    .field label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+ 
+    .field input {
+      width: 100%; padding: 11px 14px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 15px; font-family: 'DM Sans', sans-serif;
+      color: var(--text); background: #FAFAF8; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(45,80,22,0.1);
+      background: #fff;
+    }
+    .field input::placeholder { color: #AEABA4; }
+ 
+    .field .err { display: none; font-size: 12px; color: var(--error); margin-top: 5px; }
+    .field.erro input  { border-color: var(--error); background: var(--error-bg); }
+    .field.erro .err   { display: block; }
+ 
+    /* ── Botões ── */
+    .btn {
+      flex: 1; padding: 12px;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 999px;
+      font-size: 15px; font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer; transition: opacity 0.15s, transform 0.12s;
+    }
+    .btn:hover  { opacity: 0.88; }
+    .btn:active { transform: scale(0.98); }
+ 
+    .btn-sec {
+      flex: 1; padding: 12px;
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 999px;
+      font-size: 15px; font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .btn-sec:hover { background: var(--bg); }
+ 
+    .btn-group { display: flex; gap: 8px; margin-top: 0.5rem; }
+    .btn-solo  { display: flex; margin-top: 0.5rem; }
+ 
+    /* ── Sucesso ── */
+    .check-circle {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--accent-light); color: var(--accent);
+      font-size: 22px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+ 
+    .card-resumo {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem;
+      margin: 1.5rem 0;
+    }
+ 
+    .card-resumo h2 {
+      font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--muted);
+      font-weight: 600; margin-bottom: 0.75rem;
+    }
+ 
+    .resumo-row {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 1rem;
+      padding: 6px 0; border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .resumo-row:last-child { border-bottom: none; }
+    .resumo-row span   { color: var(--muted); }
+    .resumo-row strong { color: var(--text); font-weight: 500; text-align: right; word-break: break-word; max-width: 60%; }
+ 
+    .divider { height: 1px; background: var(--border); margin: 1rem 0; }
+  </style>
 </head>
 <body>
  
-  <div class="page" id="page-crianca">
+  <!-- ══ TELA 1: Responsável ══ -->
+  <div class="tela ativa" id="tela-1">
     <div class="container">
  
-      <div class="step-indicator">
-        <div class="step done">
-          <span class="step-number">✓</span>
-          <span class="step-label">Responsável</span>
+      <div class="steps">
+        <div class="step ativo" id="s1">
+          <div class="step-num">1</div>
+          <div class="step-label">Responsável</div>
         </div>
-        <div class="step-line active"></div>
-        <div class="step active">
-          <span class="step-number">2</span>
-          <span class="step-label">Criança</span>
+        <div class="step-line" id="linha"></div>
+        <div class="step" id="s2">
+          <div class="step-num">2</div>
+          <div class="step-label">Criança</div>
+        </div>
+      </div>
+ 
+      <h1>Cadastro do Responsável</h1>
+      <p class="sub">Preencha os dados de quem será responsável pela criança.</p>
+ 
+      <div class="field" id="f-nome">
+        <label for="nome">Nome completo</label>
+        <input type="text" id="nome" placeholder="Ex: Maria da Silva">
+        <span class="err">Campo obrigatório</span>
+      </div>
+ 
+      <div class="field" id="f-tel">
+        <label for="tel">Telefone</label>
+        <input type="text" id="tel" placeholder="(11) 90000-0000" maxlength="15">
+        <span class="err">Campo obrigatório</span>
+      </div>
+ 
+      <div class="field" id="f-end">
+        <label for="end">Endereço</label>
+        <input type="text" id="end" placeholder="Rua, número, bairro">
+        <span class="err">Campo obrigatório</span>
+      </div>
+ 
+      <div class="field" id="f-cpf">
+        <label for="cpf">CPF</label>
+        <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
+        <span class="err">Campo obrigatório</span>
+      </div>
+ 
+      <div class="btn-solo">
+        <button class="btn" onclick="irParaCrianca()">Avançar →</button>
+      </div>
+ 
+    </div>
+  </div>
+ 
+  <!-- ══ TELA 2: Criança ══ -->
+  <div class="tela" id="tela-2">
+    <div class="container">
+ 
+      <div class="steps">
+        <div class="step feito">
+          <div class="step-num">✓</div>
+          <div class="step-label">Responsável</div>
+        </div>
+        <div class="step-line ativo"></div>
+        <div class="step ativo">
+          <div class="step-num">2</div>
+          <div class="step-label">Criança</div>
         </div>
       </div>
  
       <h1>Cadastro da Criança</h1>
-      <p class="subtitle">Agora informe os dados da criança.</p>
+      <p class="sub">Agora informe os dados da criança.</p>
  
-      <div class="field" id="f-nome-crianca">
-        <label for="nome-crianca">Nome da criança</label>
-        <input type="text" id="nome-crianca" placeholder="Ex: João da Silva">
+      <div class="field" id="f-nc">
+        <label for="nc">Nome da criança</label>
+        <input type="text" id="nc" placeholder="Ex: João da Silva">
         <span class="err">Campo obrigatório</span>
       </div>
  
@@ -45,13 +255,145 @@
       </div>
  
       <div class="btn-group">
-        <button class="btn btn-secondary" onclick="window.location.href='responsavel.html'">← Voltar</button>
-        <button class="btn" onclick="finalizar()">Finalizar →</button>
+        <button class="btn-sec" onclick="voltarParaResponsavel()">← Voltar</button>
+        <button class="btn"     onclick="finalizar()">Finalizar →</button>
       </div>
  
     </div>
   </div>
  
-  <script src="script.js"></script>
+  <!-- ══ TELA 3: Sucesso ══ -->
+  <div class="tela" id="tela-3">
+    <div class="container">
+ 
+      <div class="check-circle">✓</div>
+      <h1>Cadastro Finalizado!</h1>
+      <p class="sub">Todos os dados foram registrados com sucesso.</p>
+ 
+      <div class="card-resumo">
+        <h2>Responsável</h2>
+        <div class="resumo-row"><span>Nome</span>    <strong id="r-nome"></strong></div>
+        <div class="resumo-row"><span>Telefone</span><strong id="r-tel"></strong></div>
+        <div class="resumo-row"><span>Endereço</span><strong id="r-end"></strong></div>
+        <div class="resumo-row"><span>CPF</span>     <strong id="r-cpf"></strong></div>
+ 
+        <div class="divider"></div>
+ 
+        <h2>Criança</h2>
+        <div class="resumo-row"><span>Nome</span>    <strong id="r-nc"></strong></div>
+        <div class="resumo-row"><span>Idade</span>   <strong id="r-idade"></strong></div>
+        <div class="resumo-row"><span>Escola</span>  <strong id="r-escola"></strong></div>
+      </div>
+ 
+      <div class="btn-solo">
+        <button class="btn" onclick="novoCadastro()">Novo Cadastro</button>
+      </div>
+ 
+    </div>
+  </div>
+ 
+  <script>
+    // Dados em memória (sem localStorage)
+    const dados = {}
+ 
+    // ── Máscaras ──
+    document.getElementById('tel').addEventListener('input', function () {
+      let v = this.value.replace(/\D/g, '').slice(0, 11)
+      if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
+      else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d*)/, '($1) $2-$3')
+      else if (v.length > 2) v = v.replace(/^(\d{2})(\d*)/, '($1) $2')
+      this.value = v
+    })
+ 
+    document.getElementById('cpf').addEventListener('input', function () {
+      let v = this.value.replace(/\D/g, '').slice(0, 11)
+      if (v.length > 9) v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4')
+      else if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d*)/, '$1.$2.$3')
+      else if (v.length > 3) v = v.replace(/^(\d{3})(\d*)/, '$1.$2')
+      this.value = v
+    })
+ 
+    // ── Helpers ──
+    function mostrarTela(id) {
+      document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'))
+      document.getElementById(id).classList.add('ativa')
+      // Força re-animação
+      const c = document.querySelector('#' + id + ' .container')
+      c.style.animation = 'none'
+      c.offsetHeight // reflow
+      c.style.animation = ''
+    }
+ 
+    function validar(inputId, fieldId) {
+      const val = document.getElementById(inputId).value.trim()
+      const field = document.getElementById(fieldId)
+      if (!val) { field.classList.add('erro'); return false }
+      field.classList.remove('erro'); return true
+    }
+ 
+    // ── Tela 1 → 2 ──
+    function irParaCrianca() {
+      const ok = [
+        validar('nome', 'f-nome'),
+        validar('tel',  'f-tel'),
+        validar('end',  'f-end'),
+        validar('cpf',  'f-cpf')
+      ].every(Boolean)
+ 
+      if (!ok) return
+ 
+      dados.nome = document.getElementById('nome').value.trim()
+      dados.tel  = document.getElementById('tel').value.trim()
+      dados.end  = document.getElementById('end').value.trim()
+      dados.cpf  = document.getElementById('cpf').value.trim()
+ 
+      mostrarTela('tela-2')
+    }
+ 
+    // ── Tela 2 → 1 ──
+    function voltarParaResponsavel() {
+      mostrarTela('tela-1')
+    }
+ 
+    // ── Tela 2 → 3 ──
+    function finalizar() {
+      const ok = [
+        validar('nc',     'f-nc'),
+        validar('idade',  'f-idade'),
+        validar('escola', 'f-escola')
+      ].every(Boolean)
+ 
+      if (!ok) return
+ 
+      dados.nc     = document.getElementById('nc').value.trim()
+      dados.idade  = document.getElementById('idade').value.trim() + ' anos'
+      dados.escola = document.getElementById('escola').value.trim()
+ 
+      // Preenche o resumo
+      document.getElementById('r-nome').textContent  = dados.nome
+      document.getElementById('r-tel').textContent   = dados.tel
+      document.getElementById('r-end').textContent   = dados.end
+      document.getElementById('r-cpf').textContent   = dados.cpf
+      document.getElementById('r-nc').textContent    = dados.nc
+      document.getElementById('r-idade').textContent = dados.idade
+      document.getElementById('r-escola').textContent= dados.escola
+ 
+      mostrarTela('tela-3')
+    }
+ 
+    // ── Recomeçar ──
+    function novoCadastro() {
+      ['nome','tel','end','cpf','nc','idade','escola'].forEach(id => {
+        document.getElementById(id).value = ''
+      })
+      ;['f-nome','f-tel','f-end','f-cpf','f-nc','f-idade','f-escola'].forEach(id => {
+        document.getElementById(id).classList.remove('erro')
+      })
+      Object.keys(dados).forEach(k => delete dados[k])
+      mostrarTela('tela-1')
+    }
+  </script>
+ 
 </body>
 </html>
+ 
