@@ -76,22 +76,48 @@
 
     .field { margin-bottom: 1.1rem; }
     .field label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
-    .field input {
+
+    .field input,
+    .field select {
       width: 100%; padding: 11px 14px;
       border: 1px solid var(--border); border-radius: var(--radius-sm);
       font-size: 15px; font-family: 'DM Sans', sans-serif;
       color: var(--text); background: #FAFAF8; outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none; -webkit-appearance: none;
     }
-    .field input:focus {
+
+    .select-wrap {
+      position: relative;
+    }
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid var(--muted);
+      pointer-events: none;
+    }
+
+    .field select option[value=""] { color: #AEABA4; }
+
+    .field input:focus,
+    .field select:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(45,80,22,0.1);
       background: #fff;
     }
     .field input::placeholder { color: #AEABA4; }
     .field .err { display: none; font-size: 12px; color: var(--error); margin-top: 5px; }
-    .field.erro input { border-color: var(--error); background: var(--error-bg); }
+    .field.erro input,
+    .field.erro select { border-color: var(--error); background: var(--error-bg); }
     .field.erro .err  { display: block; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     .btn {
       flex: 1; padding: 12px;
@@ -233,15 +259,54 @@
         <input type="text" id="nc" placeholder="Ex: João da Silva">
         <span class="err">Campo obrigatório</span>
       </div>
+
       <div class="field" id="f-idade">
         <label for="idade">Idade</label>
         <input type="number" id="idade" placeholder="Ex: 8" min="0" max="17">
         <span class="err">Campo obrigatório</span>
       </div>
+
       <div class="field" id="f-escola">
         <label for="escola">Escola</label>
-        <input type="text" id="escola" placeholder="Ex: E.M. Monteiro Lobato">
-        <span class="err">Campo obrigatório</span>
+        <div class="select-wrap">
+          <select id="escola">
+            <option value="">Selecione a escola</option>
+            <option value="EMEF Galdino Lopes Chagas">EMEF Galdino Lopes Chagas</option>
+            <option value="EMEF João Solimeu">EMEF João Solimeu</option>
+            <option value="CEMEI Batuira">CEMEI Batuira</option>
+            <option value="CEI Casa da Criança">CEI Casa da Criança</option>
+            <option value="CEI Boaventura">CEI Boaventura</option>
+            <option value="CEI Arco-Íris">CEI Arco-Íris</option>
+          </select>
+        </div>
+        <span class="err">Selecione uma escola</span>
+      </div>
+
+      <div class="field-row">
+        <div class="field" id="f-periodo">
+          <label for="periodo">Período</label>
+          <div class="select-wrap">
+            <select id="periodo">
+              <option value="">Selecione</option>
+              <option value="Manhã">Manhã</option>
+              <option value="Tarde">Tarde</option>
+            </select>
+          </div>
+          <span class="err">Obrigatório</span>
+        </div>
+
+        <div class="field" id="f-vencimento">
+          <label for="vencimento">Vencimento</label>
+          <div class="select-wrap">
+            <select id="vencimento">
+              <option value="">Selecione</option>
+              <option value="Dia 05">Dia 05</option>
+              <option value="Dia 15">Dia 15</option>
+              <option value="Dia 25">Dia 25</option>
+            </select>
+          </div>
+          <span class="err">Obrigatório</span>
+        </div>
       </div>
 
       <div class="btn-group">
@@ -270,9 +335,11 @@
         <div class="resumo-row"><span>CPF</span>     <strong id="r-cpf"></strong></div>
         <div class="divider"></div>
         <h2>Criança</h2>
-        <div class="resumo-row"><span>Nome</span>    <strong id="r-nc"></strong></div>
-        <div class="resumo-row"><span>Idade</span>   <strong id="r-idade"></strong></div>
-        <div class="resumo-row"><span>Escola</span>  <strong id="r-escola"></strong></div>
+        <div class="resumo-row"><span>Nome</span>       <strong id="r-nc"></strong></div>
+        <div class="resumo-row"><span>Idade</span>      <strong id="r-idade"></strong></div>
+        <div class="resumo-row"><span>Escola</span>     <strong id="r-escola"></strong></div>
+        <div class="resumo-row"><span>Período</span>    <strong id="r-periodo"></strong></div>
+        <div class="resumo-row"><span>Vencimento</span> <strong id="r-vencimento"></strong></div>
       </div>
 
       <div class="btn-solo">
@@ -282,7 +349,6 @@
   </div>
 
   <script>
-    // ── URL do Google Apps Script ──
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxx3mJ0pJhc04HouPJ8ChbS16bAeaCc7vQe6tAn6NSWT9YIHdZJD5lqYqM-faDkV07s/exec'
 
     const dados = {}
@@ -343,25 +409,28 @@
       mostrarTela('tela-1')
     }
 
-    // ── Tela 2 → enviar via FormData → Tela 3 ──
+    // ── Tela 2 → enviar → Tela 3 ──
     async function finalizar() {
       const ok = [
-        validar('nc',    'f-nc'),
-        validar('idade', 'f-idade'),
-        validar('escola','f-escola')
+        validar('nc',         'f-nc'),
+        validar('idade',      'f-idade'),
+        validar('escola',     'f-escola'),
+        validar('periodo',    'f-periodo'),
+        validar('vencimento', 'f-vencimento')
       ].every(Boolean)
       if (!ok) return
 
-      dados.nc     = document.getElementById('nc').value.trim()
-      dados.idade  = document.getElementById('idade').value.trim() + ' anos'
-      dados.escola = document.getElementById('escola').value.trim()
+      dados.nc         = document.getElementById('nc').value.trim()
+      dados.idade      = document.getElementById('idade').value.trim() + ' anos'
+      dados.escola     = document.getElementById('escola').value
+      dados.periodo    = document.getElementById('periodo').value
+      dados.vencimento = document.getElementById('vencimento').value
 
       const btn = document.getElementById('btn-finalizar')
       btn.disabled = true
       btn.innerHTML = '<span class="spinner"></span> Salvando...'
       document.getElementById('alerta-erro').classList.remove('visivel')
 
-      // Monta FormData — funciona sem CORS
       const form = new FormData()
       Object.entries(dados).forEach(([k, v]) => form.append(k, v))
 
@@ -372,14 +441,15 @@
           body: form
         })
 
-        // Preenche resumo
-        document.getElementById('r-nome').textContent   = dados.nome
-        document.getElementById('r-tel').textContent    = dados.tel
-        document.getElementById('r-end').textContent    = dados.end
-        document.getElementById('r-cpf').textContent    = dados.cpf
-        document.getElementById('r-nc').textContent     = dados.nc
-        document.getElementById('r-idade').textContent  = dados.idade
-        document.getElementById('r-escola').textContent = dados.escola
+        document.getElementById('r-nome').textContent       = dados.nome
+        document.getElementById('r-tel').textContent        = dados.tel
+        document.getElementById('r-end').textContent        = dados.end
+        document.getElementById('r-cpf').textContent        = dados.cpf
+        document.getElementById('r-nc').textContent         = dados.nc
+        document.getElementById('r-idade').textContent      = dados.idade
+        document.getElementById('r-escola').textContent     = dados.escola
+        document.getElementById('r-periodo').textContent    = dados.periodo
+        document.getElementById('r-vencimento').textContent = dados.vencimento
 
         mostrarTela('tela-3')
 
@@ -393,10 +463,13 @@
 
     // ── Recomeçar ──
     function novoCadastro() {
-      ;['nome','tel','end','cpf','nc','idade','escola'].forEach(id => {
+      ;['nome','tel','end','cpf','nc','idade'].forEach(id => {
         document.getElementById(id).value = ''
       })
-      ;['f-nome','f-tel','f-end','f-cpf','f-nc','f-idade','f-escola'].forEach(id => {
+      ;['escola','periodo','vencimento'].forEach(id => {
+        document.getElementById(id).value = ''
+      })
+      ;['f-nome','f-tel','f-end','f-cpf','f-nc','f-idade','f-escola','f-periodo','f-vencimento'].forEach(id => {
         document.getElementById(id).classList.remove('erro')
       })
       Object.keys(dados).forEach(k => delete dados[k])
@@ -406,4 +479,3 @@
 
 </body>
 </html>
- 
